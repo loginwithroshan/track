@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>India Phone Tracker - Track Mobile Number Location</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #45b7d1 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 550px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .tagline {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .main-content {
+            padding: 40px 30px;
+        }
+
+        .disclaimer {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+            color: #856404;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        input[type="tel"] {
+            width: 100%;
+            padding: 22px 20px 22px 70px;
+            border: 3px solid #e9ecef;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            background: linear-gradient(145deg, #f8f9fa, #ffffff);
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        input[type="tel"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .flag-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+        }
+
+        .operator-info {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            display: none;
+        }
+
+        .track-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .track-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .track-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-left: 5px solid;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .result-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.3rem;
+            color: white;
+        }
+
+        .location { border-left-color: #28a745; }
+        .location .result-icon { background: #28a745; }
+
+        .circle { border-left-color: #17a2b8; }
+        .circle .result-icon { background: #17a2b8; }
+
+        .type { border-left-color: #ffc107; }
+        .type .result-icon { background: #ffc107; color: #212529; }
+
+        .state { border-left-color: #6f42c1; }
+        .state .result-icon { background: #6f42c1; }
+
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .result-detail {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #555;
+            margin-top: 5px;
+        }
+
+        .error {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 25px;
+            border-radius: 20px;
+            margin-top: 20px;
+            border-left: 5px solid #dc3545;
+        }
+
+        .test-numbers {
+            background: #e8f5e8;
+            border: 1px solid #c3e6c3;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 25px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h1>India Phone Tracker</h1>
+            <p class="tagline">Track mobile number location, circle & operator</p>
+        </div>
+
+        <div class="main-content">
+            <div class="disclaimer">
+                <i class="fas fa-info-circle"></i>
+                Educational demo using mock data. Real tracking requires TRAI authorization & legal permission.
+            </div>
+
+            <div class="input-section">
+                <div class="input-group">
+                    <span class="flag-icon">🇮🇳</span>
+                    <input type="tel" id="phoneInput" placeholder="91XXXXXXXXX or 10 digit number" maxlength="12">
+                </div>
+
+                <div class="operator-info" id="operatorInfo">
+                    <i class="fas fa-info-circle"></i>
+                    <span id="operatorText"></span>
+                </div>
+
+                <button class="track-btn" onclick="trackPhone()">
+                    <i class="fas fa-search-location"></i> Track Number
+                </button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div>🔍 Locating phone number...</div>
+                <div style="font-size: 0.9rem; margin-top: 10px; opacity: 0.8;">Connecting to telecom database</div>
+            </div>
+
+            <div class="error" id="error"></div>
+
+            <div class="results" id="results"></div>
+
+            <div class="test-numbers">
+                <strong>🧪 Test Numbers:</strong><br>
+                9876543210 • 8765432109 • 9123456789 • 7890123456
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // India-specific mobile number data (Realistic mock data)
+        const indiaMobileData = {
+            // Airtel
+            '9876543210': { circle: 'Delhi', operator: 'Airtel', type: 'Postpaid', state: 'Delhi' },
+            '9876543211': { circle: 'Mumbai', operator: 'Airtel', type: 'Prepaid', state: 'Maharashtra' },
+            '9876543212': { circle: 'Kolkata', operator: 'Airtel', type: 'Prepaid', state: 'West Bengal' },
+
+            // Jio
+            '8765432109': { circle: 'Mumbai', operator: 'Jio', type: 'Prepaid', state: 'Maharashtra' },
+            '8765432108': { circle: 'Delhi', operator: 'Jio', type: 'Prepaid', state: 'Delhi' },
+            '8765432107': { circle: 'Chennai', operator: 'Jio', type: 'Prepaid', state: 'Tamil Nadu' },
+
+            // Vi (Vodafone Idea)
+            '9123456789': { circle: 'Delhi', operator: 'Vi', type: 'Postpaid', state: 'Delhi' },
+            '9123456780': { circle: 'Punjab', operator: 'Vi', type: 'Prepaid', state: 'Punjab' },
+
+            // BSNL
+            '7890123456': { circle: 'Kerala', operator: 'BSNL', type: 'Postpaid', state: 'Kerala' },
+            '7890123457': { circle: 'Rajasthan', operator: 'BSNL', type: 'Prepaid', state: 'Rajasthan' },
+
+            // MTNL (Delhi/Mumbai)
+            '9012345678': { circle: 'Delhi', operator: 'MTNL', type: 'Postpaid', state: 'Delhi' }
+        };
+
+        // Telecom Circle to Location mapping
+        const circleLocations = {
+            'Delhi': 'Connaught Place, New Delhi',
+            'Mumbai': 'Colaba, Mumbai',
+            'Kolkata': 'Park Street, Kolkata',
+            'Chennai': 'T. Nagar, Chennai',
+            'Punjab': 'Chandigarh',
+            'Kerala': 'Kochi',
+            'Rajasthan': 'Jaipur'
+        };
+
+        const phoneInput = document.getElementById('phoneInput');
+
+        // Auto-format Indian numbers
+        phoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            // Remove leading 91 if present, keep 10 digits
+            if (value.startsWith('91')) value = value.slice(2);
+            if (value.length > 10) value = value.slice(0, 10);
+            
+            // Show operator preview for 4+ digits
+            if (value.length >= 4) {
+                showOperatorPreview(value);
+            } else {
+                document.getElementById('operatorInfo').style.display = 'none';
+            }
+            
+            e.target.value = value;
+        });
+
+        function showOperatorPreview(number) {
+            const series = number.slice(0, 4);
+            const operators = {
+                '9876': 'Airtel Delhi',
+                '8765': 'Jio Mumbai', 
+                '9123': 'Vi Delhi',
+                '7890': 'BSNL Kerala',
+                '9012': 'MTNL Delhi'
+            };
+            
+            const op = operators[series];
+            if (op) {
+                document.getElementById('operatorText').textContent = `${op} detected`;
+                document.getElementById('operatorInfo').style.display = 'block';
+            }
+        }
+
+        async function trackPhone() {
+            const phone = phoneInput.value.replace(/\D/g, '');
+            const trackBtn = document.querySelector('.track-btn');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const results = document.getElementById('results');
+
+            // Validation
+            if (phone.length !== 10 || !/^[6-9]\d{9}$/.test(phone)) {
+                showError('Please enter valid 10-digit Indian mobile number starting with 6-9');
+                return;
+            }
+
+            // Reset UI
+            error.style.display = 'none';
+            results.style.display = 'none';
+            trackBtn.disabled = true;
+            loading.style.display = 'block';
+
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 2500));
+
+            if (indiaMobileData[phone]) {
+                displayResults(indiaMobileData[phone], phone);
+            } else {
+                showError('No data found for this number. Try test numbers provided below.');
+            }
+
+            loading.style.display = 'none';
+            trackBtn.disabled = false;
+        }
+
+        function displayResults(data, phone) {
+            const location = circleLocations[data.circle] || data.circle;
+            const results = document.getElementById('results');
+            
+            results.innerHTML = `
+                <div class="result-card location">
+                    <div class="result-header">
+                        <div class="result-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <div class="result-title">📍 Telecom Circle & Location</div>
+                            <div class="result-detail">${data.circle} Circle<br><small>${location}</small></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-card circle">
+                    <div class="result-header">
+                        <div class="result-icon">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <div>
+                            <div class="result-title">📡 Telecom Operator</div>
+                            <div class="result-detail">${data.operator}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-card type">
+                    <div class="result-header">
+                        <div class="result-icon">
+                            <i class="fas fa-sim-card"></i>
+                        </div>
+                        <div>
+                            <div class="result-title">📱 Number Type</div>
+                            <div class="result-detail">${data.type}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-card state">
+                    <div class="result-header">
+                        <div class="result-icon">
+                            <i class="fas fa-map"></i>
+                        </div>
+                        <div>
+                            <div class="result-title">🏛️ State</div>
+                            <div class="result-detail">${data.state}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            results.style.display = 'block';
+        }
+
+        function showError(message) {
+            document.getElementById('error').textContent = message;
+            document.getElementById('error').style.display = 'block';
+        }
+
+        // Enter key support
+        phoneInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') trackPhone();
+        });
+
+        // Auto-focus on load
+        window.onload = () => phoneInput.focus();
+    </script>
+</body>
+</html>
